@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S&amp;P 500 Investing Guide</title>
+<meta name="description" content="An educational guide to investing in the S&P 500, with an interactive growth calculator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #eef1f5;
+  --text: #16202c;
+  --muted: #5b6776;
+  --border: #dde2e9;
+  --accent: #0f7b5f;
+  --accent-soft: #e2f3ed;
+  --accent-2: #2f5fd0;
+  --warn: #9a5b00;
+  --hero-from: #0d1b2a;
+  --hero-to: #1b3a4b;
+  --shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1319;
+    --surface: #161d26;
+    --surface-2: #1d2631;
+    --text: #e7ecf2;
+    --muted: #9aa6b4;
+    --border: #2a3542;
+    --accent: #3ccf9f;
+    --accent-soft: #143a2f;
+    --accent-2: #7aa2ff;
+    --warn: #f0b860;
+    --hero-from: #070c12;
+    --hero-to: #122634;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1319;
+  --surface: #161d26;
+  --surface-2: #1d2631;
+  --text: #e7ecf2;
+  --muted: #9aa6b4;
+  --border: #2a3542;
+  --accent: #3ccf9f;
+  --accent-soft: #143a2f;
+  --accent-2: #7aa2ff;
+  --warn: #f0b860;
+  --hero-from: #070c12;
+  --hero-to: #122634;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent-2); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+/* Nav */
+nav {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+nav .wrap { display: flex; align-items: center; gap: 16px; height: 56px; }
+.brand { font-weight: 800; letter-spacing: -.02em; text-decoration: none; color: var(--text); white-space: nowrap; }
+.brand span { color: var(--accent); }
+.nav-links { display: flex; gap: 4px; overflow-x: auto; margin-left: auto; scrollbar-width: none; }
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a {
+  color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500;
+  padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+}
+.nav-links a:hover { background: var(--surface-2); color: var(--text); }
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--hero-from), var(--hero-to));
+  color: #fff;
+  padding: 72px 0 64px;
+}
+.hero .eyebrow { color: #7fe3c2; font-weight: 600; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+.hero h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.1; letter-spacing: -.03em; margin: 12px 0 16px; max-width: 760px; }
+.hero p { font-size: 18px; color: #c9d4df; max-width: 640px; margin: 0 0 28px; }
+.btn {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  font-weight: 600; padding: 12px 20px; border-radius: 10px;
+}
+.hero .btn { background: #3ccf9f; color: #06221a; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 48px; }
+.stat { border-left: 2px solid rgba(255,255,255,.2); padding-left: 14px; }
+.stat b { display: block; font-size: 26px; letter-spacing: -.02em; }
+.stat small { color: #a9b6c3; font-size: 13px; }
+
+/* Sections */
+section { padding: 64px 0; }
+section + section { border-top: 1px solid var(--border); }
+h2 { font-size: clamp(26px, 4vw, 34px); letter-spacing: -.02em; margin: 0 0 8px; }
+.lead { color: var(--muted); font-size: 17px; margin: 0 0 32px; max-width: 680px; }
+.grid { display: grid; gap: 16px; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 22px; box-shadow: var(--shadow);
+}
+.card h3 { margin: 0 0 8px; font-size: 18px; }
+.card p { margin: 0; color: var(--muted); }
+.num {
+  width: 32px; height: 32px; border-radius: 8px; background: var(--accent-soft); color: var(--accent);
+  display: grid; place-items: center; font-weight: 700; margin-bottom: 12px;
+}
+
+/* Calculator */
+.calc { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
+.field { margin-bottom: 18px; }
+.field label { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.field label output { color: var(--accent); font-variant-numeric: tabular-nums; }
+.field input[type="number"] {
+  width: 100%; padding: 10px 12px; font: inherit; font-size: 15px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); color: var(--text);
+}
+.field input[type="range"] { width: 100%; accent-color: var(--accent); }
+.field .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.result { background: var(--surface-2); border-radius: 12px; padding: 14px; }
+.result small { color: var(--muted); font-size: 12px; font-weight: 500; display: block; }
+.result b { font-size: 22px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.result.main b { color: var(--accent); }
+.chart-box { position: relative; height: 340px; }
+.presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.chip {
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+  font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 999px; cursor: pointer;
+}
+.chip:hover { border-color: var(--accent); }
+.note { font-size: 13px; color: var(--muted); margin-top: 12px; }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+details.card { padding: 0; }
+details summary { cursor: pointer; padding: 16px 22px; font-weight: 600; }
+details .table-wrap { padding: 0 22px 16px; max-height: 360px; overflow-y: auto; }
+
+/* FAQ */
+.faq details { border-bottom: 1px solid var(--border); }
+.faq summary { padding: 16px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--accent); font-size: 20px; line-height: 1; }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { margin: 0 0 16px; color: var(--muted); }
+
+/* Quiz */
+.quiz-q { margin-bottom: 20px; }
+.quiz-q p { font-weight: 600; margin: 0 0 8px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 10px; cursor: pointer; }
+.opt.right { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.opt.wrong { opacity: .5; text-decoration: line-through; }
+.feedback { font-size: 14px; color: var(--muted); margin-top: 6px; min-height: 1em; }
+
+/* Glossary */
+dl { margin: 0; display: grid; grid-template-columns: 200px 1fr; gap: 0; }
+dt, dd { padding: 12px 0; border-bottom: 1px solid var(--border); margin: 0; }
+dt { font-weight: 700; }
+dd { color: var(--muted); }
+
+/* Thanks */
+.thanks { background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); color: #fff; }
+.thanks-inner { display: grid; grid-template-columns: 220px 1fr; gap: 36px; align-items: center; }
+.thanks img { width: 220px; height: 220px; object-fit: cover; border-radius: 50%; border: 5px solid rgba(255,255,255,.9); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.thanks .eyebrow { color: #7fe3c2; font-weight: 600; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+.thanks h2 { color: #fff; font-size: clamp(28px, 5vw, 40px); margin: 6px 0 4px; }
+.thanks .role { color: #a9b6c3; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; margin-bottom: 16px; }
+.thanks p { color: #d5dee7; font-size: 17px; margin: 0; max-width: 620px; }
+
+footer { padding: 28px 0 40px; font-size: 13px; color: var(--muted); }
+.disclaimer { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--warn); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+
+@media (max-width: 860px) {
+  .calc { grid-template-columns: 1fr; }
+  .g3 { grid-template-columns: 1fr 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .g3, .g2 { grid-template-columns: 1fr; }
+  .results { grid-template-columns: 1fr; }
+  .chart-box { height: 280px; }
+  dl { grid-template-columns: 1fr; }
+  dt { border-bottom: none; padding-bottom: 0; }
+  dd { padding-top: 4px; }
+  .thanks-inner { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .thanks img { width: 170px; height: 170px; }
+  .hero { padding: 48px 0; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top">S&amp;P <span>500</span> Guide</a>
+    <div class="nav-links">
+      <a href="#basics">Basics</a>
+      <a href="#how">How to Invest</a>
+      <a href="#calculator">Calculator</a>
+      <a href="#principles">Principles</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#thanks">Thanks</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">Investing Education</div>
+    <h1>Understand the S&amp;P 500 and see how your money could grow.</h1>
+    <p>A beginner-friendly guide to one of the most widely followed stock market indexes in the world, with an interactive calculator so you can test your own numbers.</p>
+    <a class="btn" href="#calculator">Try the calculator →</a>
+    <div class="stats">
+      <div class="stat"><b>~500</b><small>Large U.S. companies</small></div>
+      <div class="stat"><b>1957</b><small>Year the index launched</small></div>
+      <div class="stat"><b>~10%</b><small>Long-run avg. yearly return*</small></div>
+      <div class="stat"><b>~80%</b><small>Of U.S. stock market value</small></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="basics">
+  <div class="wrap">
+    <h2>What is the S&amp;P 500?</h2>
+    <p class="lead">The S&amp;P 500 is a stock market index that tracks about 500 of the largest publicly traded companies in the United States. People often use it as a snapshot of how the overall U.S. stock market is doing.</p>
+    <div class="grid g3">
+      <div class="card"><div class="num">1</div><h3>Market-cap weighted</h3><p>Bigger companies count for more. A company worth $3 trillion moves the index far more than one worth $30 billion.</p></div>
+      <div class="card"><div class="num">2</div><h3>Built-in diversification</h3><p>One investment gives you exposure to hundreds of companies across technology, healthcare, finance, energy, consumer goods and more.</p></div>
+      <div class="card"><div class="num">3</div><h3>Self-cleaning</h3><p>A committee regularly updates the list. Companies that shrink drop out, and growing companies take their place.</p></div>
+      <div class="card"><div class="num">4</div><h3>Dividends included</h3><p>Many S&amp;P 500 companies pay dividends. Reinvesting them has historically been a big part of total returns.</p></div>
+      <div class="card"><div class="num">5</div><h3>Not guaranteed</h3><p>The index has had years with losses of more than 30%. Long-term averages hide a lot of short-term ups and downs.</p></div>
+      <div class="card"><div class="num">6</div><h3>A benchmark</h3><p>Most professional fund managers are compared against the S&amp;P 500, and many fail to beat it over long periods.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <h2>How can you invest in it?</h2>
+    <p class="lead">You can't buy an index directly, but you can buy funds that copy it. Here are the most common ways.</p>
+    <div class="grid g2">
+      <div class="card"><h3>Index ETFs</h3><p>Exchange-traded funds that track the S&amp;P 500 trade like a stock during market hours. They usually have very low annual fees (expense ratios).</p></div>
+      <div class="card"><h3>Index mutual funds</h3><p>Similar to ETFs, but priced once a day. Many allow automatic monthly investments, which makes regular investing easy.</p></div>
+      <div class="card"><h3>Retirement accounts</h3><p>401(k) plans and IRAs often offer S&amp;P 500 index funds. These accounts can come with tax advantages.</p></div>
+      <div class="card"><h3>Dollar-cost averaging</h3><p>Investing a fixed amount on a regular schedule, whatever the price. You automatically buy more shares when prices are low and fewer when they're high.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="calculator">
+  <div class="wrap">
+    <h2>Growth calculator</h2>
+    <p class="lead">Change the years, your starting amount, your monthly income invested and the expected return. The chart updates instantly.</p>
+
+    <div class="calc">
+      <div class="card">
+        <div class="presets" aria-label="Return presets">
+          <button class="chip" data-rate="6">Cautious 6%</button>
+          <button class="chip" data-rate="8">Moderate 8%</button>
+          <button class="chip" data-rate="10">Historical ~10%</button>
+        </div>
+        <div class="field">
+          <label for="initial">Initial investment</label>
+          <input type="number" id="initial" min="0" step="100" value="1000">
+        </div>
+        <div class="field">
+          <label for="income">Monthly income <output id="incomeOut"></output></label>
+          <input type="number" id="income" min="0" step="100" value="3000">
+        </div>
+        <div class="field">
+          <label for="pct">% of income invested <output id="pctOut"></output></label>
+          <input type="range" id="pct" min="1" max="50" value="10">
+          <div class="hint">Monthly contribution: <b id="contribOut"></b></div>
+        </div>
+        <div class="field">
+          <label for="raise">Yearly income growth <output id="raiseOut"></output></label>
+          <input type="range" id="raise" min="0" max="10" step="0.5" value="3">
+          <div class="hint">Your contribution grows as your income grows.</div>
+        </div>
+        <div class="field">
+          <label for="years">Years invested <output id="yearsOut"></output></label>
+          <input type="range" id="years" min="1" max="50" value="30">
+        </div>
+        <div class="field">
+          <label for="rate">Expected annual return <output id="rateOut"></output></label>
+          <input type="range" id="rate" min="0" max="15" step="0.5" value="10">
+        </div>
+        <div class="field">
+          <label for="fee">Fund fee (expense ratio) <output id="feeOut"></output></label>
+          <input type="range" id="fee" min="0" max="2" step="0.01" value="0.05">
+        </div>
+        <div class="field">
+          <label for="infl">Inflation <output id="inflOut"></output></label>
+          <input type="range" id="infl" min="0" max="8" step="0.5" value="3">
+        </div>
+        <label class="check"><input type="checkbox" id="showReal" checked> Show inflation-adjusted value</label>
+      </div>
+
+      <div class="card">
+        <div class="results">
+          <div class="result main"><small>Final portfolio value</small><b id="rFinal">–</b></div>
+          <div class="result"><small>Total you contributed</small><b id="rContrib">–</b></div>
+          <div class="result"><small>Investment growth</small><b id="rGrowth">–</b></div>
+        </div>
+        <div class="chart-box"><canvas id="chart" aria-label="Portfolio growth over time"></canvas></div>
+        <p class="note">In today's dollars your portfolio would be worth about <b id="rReal">–</b>. Fees would cost you roughly <b id="rFees">–</b> over the period.</p>
+        <details class="card" style="margin-top:12px; box-shadow:none">
+          <summary>Year-by-year breakdown</summary>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Year</th><th>Monthly contrib.</th><th>Contributed</th><th>Value</th><th>Today's $</th></tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </div>
+    <p class="note">*Results assume a constant return compounded monthly. Real markets don't move in straight lines: some years are much better and some are much worse. Use this to learn, not to predict.</p>
+  </div>
+</section>
+
+<section id="principles">
+  <div class="wrap">
+    <h2>Key principles for index investors</h2>
+    <p class="lead">Simple habits matter more than picking the perfect moment.</p>
+    <div class="grid g3">
+      <div class="card"><h3>⏳ Time in the market</h3><p>Compounding needs time. Increase "Years invested" in the calculator and watch how the growth line pulls away from your contributions.</p></div>
+      <div class="card"><h3>💸 Keep fees low</h3><p>A 1% fee sounds small, but over decades it can take a large share of your gains. Try changing the fee slider.</p></div>
+      <div class="card"><h3>🧘 Stay calm in downturns</h3><p>Selling during a crash locks in losses. Historically the index has recovered from every major decline, though sometimes it took years.</p></div>
+      <div class="card"><h3>🔁 Be consistent</h3><p>Automatic monthly investing takes emotion out of the decision and builds the habit.</p></div>
+      <div class="card"><h3>🛟 Emergency fund first</h3><p>Keep a few months of expenses in savings so you're never forced to sell investments at a bad time.</p></div>
+      <div class="card"><h3>🌍 Know what you own</h3><p>The S&amp;P 500 is U.S. large companies only. Some investors add bonds or international stocks for balance.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>Common questions</h2>
+    <p class="lead">Quick answers to things beginners often ask.</p>
+    <div class="faq">
+      <details><summary>How much money do I need to start?</summary><p>Very little. Many brokers let you buy fractional shares of S&amp;P 500 ETFs for just a few dollars.</p></details>
+      <details><summary>Is it a good time to invest right now?</summary><p>Nobody can reliably predict short-term moves. That's why many long-term investors use dollar-cost averaging instead of trying to time the market.</p></details>
+      <details><summary>Can I lose money?</summary><p>Yes. The value of your investment can fall, especially over short periods. The longer your time horizon, the more time you have to recover from drops.</p></details>
+      <details><summary>What's the difference between an ETF and a mutual fund?</summary><p>ETFs trade throughout the day like stocks; mutual funds trade once a day at the closing price. Both can track the S&amp;P 500 at low cost.</p></details>
+      <details><summary>What happens to dividends?</summary><p>You can take them as cash or reinvest them automatically to buy more shares. Reinvesting helps compounding.</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <div class="wrap">
+    <h2>Test yourself</h2>
+    <p class="lead">Three quick questions. Score: <b id="score">0</b>/3</p>
+    <div class="card" id="quizBox"></div>
+  </div>
+</section>
+
+<section id="glossary">
+  <div class="wrap">
+    <h2>Glossary</h2>
+    <p class="lead">Words you'll see often.</p>
+    <div class="card">
+      <dl>
+        <dt>Index</dt><dd>A list of investments used to measure part of the market, like the S&amp;P 500.</dd>
+        <dt>Index fund</dt><dd>A fund that buys everything in an index so its returns match the index.</dd>
+        <dt>ETF</dt><dd>Exchange-traded fund: a basket of investments that trades on an exchange like a stock.</dd>
+        <dt>Expense ratio</dt><dd>The yearly fee a fund charges, shown as a percentage of your investment.</dd>
+        <dt>Compound interest</dt><dd>Earning returns on your past returns, not just on the money you put in.</dd>
+        <dt>Dividend</dt><dd>A share of company profits paid to shareholders.</dd>
+        <dt>Bear market</dt><dd>A decline of 20% or more from a recent high.</dd>
+        <dt>Bull market</dt><dd>A long period of rising prices.</dd>
+        <dt>Inflation</dt><dd>The general rise in prices that reduces what each dollar can buy.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="thanks" id="thanks">
+  <div class="wrap thanks-inner">
+    <img src="images/ray-sumler.jpg" alt="Portrait of Ray Sumler">
+    <div>
+      <div class="eyebrow">Special Thanks</div>
+      <h2>Thank you, Ray Sumler!</h2>
+      <div class="role">Division Leader · Castro Valley, CA</div>
+      <p>A heartfelt thank you to Ray Sumler for the guidance, encouragement and inspiration behind this project. Your commitment to helping people understand their finances and build a better future made this page possible.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="disclaimer"><b>Educational purposes only.</b> This website does not provide financial, investment or tax advice. Past performance does not guarantee future results. Consider speaking with a licensed professional before making investment decisions.</div>
+    <div>* The ~10% figure is a commonly cited long-term average annual total return (with dividends reinvested), before inflation. © <span id="yr"></span> S&amp;P 500 Investing Guide.</div>
+  </div>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const money = v => v.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+$("yr").textContent = new Date().getFullYear();
+
+let chart;
+
+function compute() {
+  const initial = Math.max(0, +$("initial").value || 0);
+  const income = Math.max(0, +$("income").value || 0);
+  const pct = +$("pct").value / 100;
+  const raise = +$("raise").value / 100;
+  const years = +$("years").value;
+  const rate = +$("rate").value / 100;
+  const fee = +$("fee").value / 100;
+  const infl = +$("infl").value / 100;
+
+  const mNet = Math.pow(1 + rate - fee, 1 / 12) - 1;
+  const mGross = Math.pow(1 + rate, 1 / 12) - 1;
+
+  let value = initial, noFee = initial, contributed = initial;
+  let monthly = income * pct;
+  const rows = [{ year: 0, monthly, contributed, value, real: value }];
+
+  for (let y = 1; y <= years; y++) {
+    for (let m = 0; m < 12; m++) {
+      value = value * (1 + mNet) + monthly;
+      noFee = noFee * (1 + mGross) + monthly;
+      contributed += monthly;
+    }
+    rows.push({ year: y, monthly, contributed, value, real: value / Math.pow(1 + infl, y) });
+    monthly *= 1 + raise;
+  }
+  return { rows, feesCost: noFee - value };
+}
+
+function render() {
+  $("incomeOut").textContent = money(+$("income").value || 0);
+  $("pctOut").textContent = $("pct").value + "%";
+  $("contribOut").textContent = money((+$("income").value || 0) * $("pct").value / 100) + " / month";
+  $("raiseOut").textContent = $("raise").value + "%";
+  $("yearsOut").textContent = $("years").value + " yrs";
+  $("rateOut").textContent = $("rate").value + "%";
+  $("feeOut").textContent = (+$("fee").value).toFixed(2) + "%";
+  $("inflOut").textContent = $("infl").value + "%";
+
+  const { rows, feesCost } = compute();
+  const last = rows[rows.length - 1];
+  $("rFinal").textContent = money(last.value);
+  $("rContrib").textContent = money(last.contributed);
+  $("rGrowth").textContent = money(last.value - last.contributed);
+  $("rReal").textContent = money(last.real);
+  $("rFees").textContent = money(feesCost);
+
+  $("tbody").innerHTML = rows.slice(1).map(r =>
+    `<tr><td>${r.year}</td><td>${money(r.monthly)}</td><td>${money(r.contributed)}</td><td>${money(r.value)}</td><td>${money(r.real)}</td></tr>`
+  ).join("");
+
+  const showReal = $("showReal").checked;
+  const labels = rows.map(r => r.year === 0 ? "Start" : "Yr " + r.year);
+  const accent = css("--accent"), accent2 = css("--accent-2"), muted = css("--muted"), border = css("--border"), warn = css("--warn");
+
+  const datasets = [
+    { label: "Portfolio value", data: rows.map(r => r.value), borderColor: accent, backgroundColor: accent + "26", fill: true, tension: .25, pointRadius: 0, borderWidth: 2.5 },
+    { label: "Total contributed", data: rows.map(r => r.contributed), borderColor: accent2, backgroundColor: "transparent", tension: .25, pointRadius: 0, borderWidth: 2 },
+  ];
+  if (showReal) datasets.push({ label: "Value in today's dollars", data: rows.map(r => r.real), borderColor: warn, borderDash: [6, 4], backgroundColor: "transparent", tension: .25, pointRadius: 0, borderWidth: 2 });
+
+  if (!chart) {
+    chart = new Chart($("chart"), {
+      type: "line",
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 250 },
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { labels: { color: muted, boxWidth: 12, usePointStyle: true } },
+          tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${money(c.parsed.y)}` } }
+        },
+        scales: {
+          x: { ticks: { color: muted, maxTicksLimit: 10 }, grid: { display: false } },
+          y: { ticks: { color: muted, callback: v => v >= 1e6 ? "$" + (v / 1e6).toFixed(1) + "M" : v >= 1e3 ? "$" + Math.round(v / 1e3) + "K" : "$" + v }, grid: { color: border } }
+        }
+      }
+    });
+  } else {
+    chart.data.labels = labels;
+    chart.data.datasets = datasets;
+    chart.options.plugins.legend.labels.color = muted;
+    chart.options.scales.x.ticks.color = muted;
+    chart.options.scales.y.ticks.color = muted;
+    chart.options.scales.y.grid.color = border;
+    chart.update();
+  }
+}
+
+document.querySelectorAll("#calculator input").forEach(el => el.addEventListener("input", render));
+document.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => { $("rate").value = b.dataset.rate; render(); }));
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+render();
+
+// Quiz
+const quiz = [
+  { q: "Roughly how many companies are in the S&P 500?", opts: ["30", "100", "500", "5,000"], a: 2, why: "About 500 large U.S. companies (a few have two share classes, so it's slightly over 500 stocks)." },
+  { q: "How are companies weighted in the index?", opts: ["Equally", "By market value", "By number of employees", "Alphabetically"], a: 1, why: "It's market-cap weighted: bigger companies have a bigger impact." },
+  { q: "Which usually helps long-term investors most?", opts: ["Timing the market", "High-fee funds", "Time and consistency", "Selling in crashes"], a: 2, why: "Compounding rewards staying invested and contributing regularly." },
+];
+let score = 0;
+$("quizBox").innerHTML = quiz.map((item, i) => `
+  <div class="quiz-q" data-i="${i}">
+    <p>${i + 1}. ${item.q}</p>
+    <div class="opts">${item.opts.map((o, j) => `<button class="opt" data-j="${j}">${o}</button>`).join("")}</div>
+    <div class="feedback"></div>
+  </div>`).join("");
+document.querySelectorAll(".quiz-q").forEach(box => {
+  const item = quiz[box.dataset.i];
+  box.querySelectorAll(".opt").forEach(btn => btn.addEventListener("click", () => {
+    if (box.dataset.done) return;
+    box.dataset.done = 1;
+    const j = +btn.dataset.j;
+    box.querySelectorAll(".opt").forEach((b, k) => { if (k === item.a) b.classList.add("right"); else if (k === j) b.classList.add("wrong"); });
+    if (j === item.a) score++;
+    $("score").textContent = score;
+    box.querySelector(".feedback").textContent = (j === item.a ? "✅ Correct! " : "❌ Not quite. ") + item.why;
+  }));
+});
+</script>
+</body>
+</html>
