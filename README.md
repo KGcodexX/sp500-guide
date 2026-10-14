@@ -10,4 +10,10 @@ An educational website about investing in the S&P 500, with an interactive growt
 - Special thanks to Ray Sumler
 - Light and dark mode, mobile friendly
 
+## Publish with GitHub Pages
+1. Create a new repository on GitHub and upload `index.html`, `README.md` and the `images` folder.
+2. Go to **Settings → Pages**.
+3. Under **Source**, choose **Deploy from a branch**, select `main` and `/ (root)`, then **Save**.
+4. After a minute your site will be live at `https://<your-username>.github.io/<repo-name>/`.
+
 *Educational purposes only. Not financial advice.*
